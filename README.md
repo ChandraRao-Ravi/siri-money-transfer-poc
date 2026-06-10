@@ -2,6 +2,11 @@
 
 Voice-first payment initiation POC for iOS using SwiftUI, App Intents, and App Shortcuts.[1][2]
 
+# Quick Look at the POC.
+
+<img width="736" height="1436" alt="image" src="https://github.com/user-attachments/assets/54aac141-1816-4551-b53e-d1059f5fbf62" />
+
+
 ## ✨ Highlights
 
 - 🎙️ Trigger a payment-prep flow from Siri or Shortcuts.[1][2]
