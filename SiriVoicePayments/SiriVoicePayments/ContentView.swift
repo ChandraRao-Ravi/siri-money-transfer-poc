@@ -8,17 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
+    @EnvironmentObject var draftStore: SiriVoicePaymentDraftStore
 
-#Preview {
-    ContentView()
+    var body: some View {
+        NavigationStack {
+            Group {
+                if let draft = draftStore.currentDraft {
+                    ConfirmSiriVoicePaymentView(draft: draft)
+                } else {
+                    SiriVoicePaymentsHomeView()
+                }
+            }
+            .navigationTitle("SiriVoicePayments")
+        }
+    }
 }
