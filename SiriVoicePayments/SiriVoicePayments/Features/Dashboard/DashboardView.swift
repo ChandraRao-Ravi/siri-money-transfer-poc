@@ -98,8 +98,7 @@ struct DashboardView: View {
                 }
 
                 NavigationLink {
-                    // Placeholder for payee list
-                    Text("Manage Payees (coming soon)")
+                    PayeeListView()
                 } label: {
                     actionRow(
                         title: "Manage Payees",

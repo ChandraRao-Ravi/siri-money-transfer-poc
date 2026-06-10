@@ -13,6 +13,7 @@ struct SiriVoicePaymentsApp: App {
     @StateObject private var draftStore = SiriVoicePaymentDraftStore.shared
     @StateObject private var authStore = AuthStore.shared
     @StateObject private var accountStore = AccountStore.shared
+    @StateObject private var payeeStore = PayeeStore.shared
 
     var body: some Scene {
         WindowGroup {
@@ -20,6 +21,7 @@ struct SiriVoicePaymentsApp: App {
                 .environmentObject(draftStore)
                 .environmentObject(authStore)
                 .environmentObject(accountStore)
+                .environmentObject(payeeStore)
                 .onAppear {
                     SiriVoicePaymentsShortcutsProvider.updateAppShortcutParameters()
                 }
