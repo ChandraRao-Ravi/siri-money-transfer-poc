@@ -70,4 +70,17 @@ final class AccountStore: ObservableObject {
             )
         ]
     }
+
+    func applyDebit(amount: Decimal, alias: String, description: String) {
+        balance -= amount
+        let txn = Transaction(
+            id: UUID(),
+            date: Date(),
+            amount: amount,
+            direction: .debit,
+            payeeAlias: alias,
+            description: description
+        )
+        recentTransactions.insert(txn, at: 0)
+    }
 }

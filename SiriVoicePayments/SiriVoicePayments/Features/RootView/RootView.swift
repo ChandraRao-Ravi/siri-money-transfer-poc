@@ -9,13 +9,16 @@ import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject var authStore: AuthStore
+    @EnvironmentObject var draftStore: ShortcutDraftStore
 
     var body: some View {
         Group {
-            if authStore.isLoggedIn {
-                ContentView()
-            } else {
+            if !authStore.isLoggedIn {
                 LoginView()
+            } else if let draft = draftStore.currentDraft {
+                ShortcutTransferConfirmView(draft: draft)
+            } else {
+                ContentView()
             }
         }
     }

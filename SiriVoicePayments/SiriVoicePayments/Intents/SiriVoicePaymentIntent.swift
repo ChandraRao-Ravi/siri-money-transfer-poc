@@ -11,6 +11,7 @@ import Foundation
 enum SiriVoicePaymentError: Error, CustomLocalizedStringResourceConvertible {
     case invalidAmount
     case limitExceeded
+    case missingAlias
 
     var localizedStringResource: LocalizedStringResource {
         switch self {
@@ -18,42 +19,52 @@ enum SiriVoicePaymentError: Error, CustomLocalizedStringResourceConvertible {
             return "Amount must be greater than zero."
         case .limitExceeded:
             return "For this demo, the maximum allowed amount is ₹5000."
+        case .missingAlias:
+            return "Please provide who you want to pay."
+
         }
     }
 }
 
 struct SiriVoicePaymentIntent: AppIntent {
     static var title: LocalizedStringResource = "Send Money"
-    static var description = IntentDescription("Prepare a transfer to a saved beneficiary.")
+    static var description = IntentDescription(
+        "Prepare a transfer to a saved payee using their alias and amount."
+    )
     static var openAppWhenRun: Bool = true
 
     @Parameter(
-        title: "Recipient",
+        title: "Payee alias",
         requestValueDialog: IntentDialog("Who would you like to pay?")
     )
-    var recipient: BeneficiaryEntity
+    var payeeAlias: String
 
-    // Keep this as Double so it satisfies _IntentValue conformance safely
     @Parameter(
         title: "Amount",
         requestValueDialog: IntentDialog("How much would you like to send?")
     )
     var amountToSent: Int
 
-    // To this:
     static var parameterSummary: some ParameterSummary {
         Summary("Send Money") {
-            \.$recipient
+            \.$payeeAlias
             \.$amountToSent
         }
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
+        let trimmedAlias = payeeAlias.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedAlias.isEmpty else {
+            throw SiriVoicePaymentError.missingAlias
+        }
+
         guard amountToSent > 0 else {
             throw SiriVoicePaymentError.invalidAmount
         }
 
-        guard amountToSent <= 5000 else {
+        // Demo limit; tweak as needed
+        guard amountToSent <= 500_000 else {
             throw SiriVoicePaymentError.limitExceeded
         }
 
@@ -61,16 +72,17 @@ struct SiriVoicePaymentIntent: AppIntent {
         let roundedAmount = (amount * 100).rounded() / 100
 
         await MainActor.run {
-            SiriVoicePaymentDraftStore.shared.currentDraft = SiriVoicePaymentDraft(
-                beneficiaryID: recipient.id,
-                beneficiaryName: recipient.name,
-                upiID: recipient.upiID,
-                amount: roundedAmount
+            ShortcutDraftStore.shared.setDraft(
+                payeeAlias: trimmedAlias,
+                amount: roundedAmount,
+                note: nil
             )
         }
 
-        return .result(
-            dialog: IntentDialog("Prepared payment of ₹\(Int(roundedAmount)) for \(recipient.name). Please confirm in the app.")
+        let dialog = IntentDialog(
+            "Preparing payment of ₹\(Int(roundedAmount)) for \(trimmedAlias) in SiriVoicePayments. Please confirm in the app."
         )
+
+        return .result(dialog: dialog)
     }
 }

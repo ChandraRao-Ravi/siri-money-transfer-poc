@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @EnvironmentObject var accountStore: AccountStore
+    @EnvironmentObject var authStore: AuthStore
 
     @State private var showRecent = false
     @State private var showAccountDetails = false
@@ -18,12 +19,21 @@ struct DashboardView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     balanceTile
-
                     quickActionsSection
                 }
                 .padding()
             }
             .navigationTitle("SiriVoicePayments")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        authStore.logout()
+                    } label: {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                    }
+                    .accessibilityLabel("Logout")
+                }
+            }
         }
         .sheet(isPresented: $showRecent) {
             RecentTransactionsView()

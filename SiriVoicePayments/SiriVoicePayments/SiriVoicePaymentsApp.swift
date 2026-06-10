@@ -10,7 +10,7 @@ import AppIntents
 
 @main
 struct SiriVoicePaymentsApp: App {
-    @StateObject private var draftStore = SiriVoicePaymentDraftStore.shared
+    @StateObject private var draftStore = ShortcutDraftStore.shared
     @StateObject private var authStore = AuthStore.shared
     @StateObject private var accountStore = AccountStore.shared
     @StateObject private var payeeStore = PayeeStore.shared

@@ -65,7 +65,8 @@ final class AuthStore: ObservableObject {
                 isLoggedIn = true
                 return true
             }
-        } catch {
+        } catch let error {
+            print(error.localizedDescription)
             return false
         }
 

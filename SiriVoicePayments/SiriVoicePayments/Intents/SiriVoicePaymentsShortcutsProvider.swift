@@ -13,7 +13,8 @@ struct SiriVoicePaymentsShortcutsProvider: AppShortcutsProvider {
             AppShortcut(
                 intent: SiriVoicePaymentIntent(),
                 phrases: [
-                    "Send money to \(\.$recipient) in \(.applicationName)"
+                    "Send money in \(.applicationName)",
+                    "Transfer money in \(.applicationName)"
                 ],
                 shortTitle: "Send Money",
                 systemImageName: "indianrupeesign.circle"
