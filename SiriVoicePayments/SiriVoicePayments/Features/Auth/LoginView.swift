@@ -70,8 +70,8 @@ struct LoginView: View {
                 .disabled(isLoading)
 
                 Toggle("Use Face ID next time", isOn: $biometricsToggle)
-                    .onChange(of: biometricsToggle) { newValue in
-                        authStore.enableBiometrics(newValue)
+                    .onChange(of: biometricsToggle) {
+                        authStore.enableBiometrics(biometricsToggle)
                     }
 
                 if authStore.biometricsEnabled {

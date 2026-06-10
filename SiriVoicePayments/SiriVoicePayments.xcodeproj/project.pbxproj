@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3F5FB0652FD9387800AF9351 /* Localizable in Resources */ = {isa = PBXBuildFile; fileRef = 3F5FB0642FD9387800AF9351 /* Localizable */; };
-		3FFE91AD2FD99F7800606A25 /* AuthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FFE91AC2FD99F7800606A25 /* AuthStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,7 +32,6 @@
 		3F5FB01D2FD9298100AF9351 /* SiriVoicePaymentsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SiriVoicePaymentsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F5FB0272FD9298100AF9351 /* SiriVoicePaymentsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SiriVoicePaymentsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F5FB0642FD9387800AF9351 /* Localizable */ = {isa = PBXFileReference; lastKnownFileType = text; path = Localizable; sourceTree = "<group>"; };
-		3FFE91AC2FD99F7800606A25 /* AuthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuthStore.swift; path = SiriVoicePayments/State/AuthStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -95,7 +93,6 @@
 		3F5FB0072FD9297F00AF9351 = {
 			isa = PBXGroup;
 			children = (
-				3FFE91AC2FD99F7800606A25 /* AuthStore.swift */,
 				3F5FB0642FD9387800AF9351 /* Localizable */,
 				3F5FB0122FD9297F00AF9351 /* SiriVoicePayments */,
 				3F5FB0202FD9298100AF9351 /* SiriVoicePaymentsTests */,
@@ -259,7 +256,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3FFE91AD2FD99F7800606A25 /* AuthStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

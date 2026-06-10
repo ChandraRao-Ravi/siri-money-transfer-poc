@@ -12,12 +12,14 @@ import AppIntents
 struct SiriVoicePaymentsApp: App {
     @StateObject private var draftStore = SiriVoicePaymentDraftStore.shared
     @StateObject private var authStore = AuthStore.shared
+    @StateObject private var accountStore = AccountStore.shared
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(draftStore)
                 .environmentObject(authStore)
+                .environmentObject(accountStore)
                 .onAppear {
                     SiriVoicePaymentsShortcutsProvider.updateAppShortcutParameters()
                 }
