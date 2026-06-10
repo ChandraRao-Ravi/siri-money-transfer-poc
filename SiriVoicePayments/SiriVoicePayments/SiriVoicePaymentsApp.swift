@@ -11,13 +11,14 @@ import AppIntents
 @main
 struct SiriVoicePaymentsApp: App {
     @StateObject private var draftStore = SiriVoicePaymentDraftStore.shared
-    
+    @StateObject private var authStore = AuthStore.shared
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
                 .environmentObject(draftStore)
+                .environmentObject(authStore)
                 .onAppear {
-                    // Force the sync once the view hierarchy is active and registered
                     SiriVoicePaymentsShortcutsProvider.updateAppShortcutParameters()
                 }
         }
