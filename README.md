@@ -1,6 +1,6 @@
 # SiriVoicePayments
 
-Voice-first payment initiation POC for iOS using SwiftUI, App Intents, and App Shortcuts.[1][2]
+Voice-first payment initiation POC for iOS using SwiftUI, App Intents, and App Shortcuts.
 
 # Quick Look at the POC.
 
@@ -9,16 +9,16 @@ Voice-first payment initiation POC for iOS using SwiftUI, App Intents, and App S
 
 ## ✨ Highlights
 
-- 🎙️ Trigger a payment-prep flow from Siri or Shortcuts.[1][2]
-- 👤 Resolve saved beneficiaries with `AppEntity` + `EntityQuery`.[1][3]
+- 🎙️ Trigger a payment-prep flow from Siri or Shortcuts.
+- 👤 Resolve saved beneficiaries with `AppEntity` + `EntityQuery`.
 - 📱 Open the app with a prefilled draft and confirm inside the UI.
-- 🔐 Keep the final payment step inside the app instead of silently transferring money.[2][4]
+- 🔐 Keep the final payment step inside the app instead of silently transferring money.
 
 ## 🧱 Stack
 
 - SwiftUI
-- App Intents[1]
-- App Shortcuts[3]
+- App Intents
+- App Shortcuts
 - iOS 18+
 
 ## 📂 Structure
@@ -49,9 +49,9 @@ SiriVoicePayments/
 
 ## ⚙️ Flow
 
-1. 🚀 App starts and registers shortcuts with `updateAppShortcutParameters()`.[5][6]
-2. 🎙️ Siri or Shortcuts runs the payment intent.[1][2]
-3. 👤 The app resolves the beneficiary using app entities.[1][3]
+1. 🚀 App starts and registers shortcuts with `updateAppShortcutParameters()`.
+2. 🎙️ Siri or Shortcuts runs the payment intent.
+3. 👤 The app resolves the beneficiary using app entities.
 4. 🧾 A draft payment is created.
 5. ✅ The app opens a confirmation screen.
 
@@ -60,7 +60,7 @@ SiriVoicePayments/
 1. Clone the repo.
 2. Open the project in Xcode.
 3. Build and run on simulator or device.
-4. For better Siri name recognition, add `INAlternativeAppNames` in `Info.plist`.[5]
+4. For better Siri name recognition, add `INAlternativeAppNames` in `Info.plist`.
 
 ```xml
 <key>INAlternativeAppNames</key>
@@ -76,9 +76,9 @@ SiriVoicePayments/
 
 ## 📱 Device notes
 
-- 🧪 Simulator is okay for basic validation, but Siri/App Shortcuts behavior can be inconsistent there.[5][7]
-- 💳 A free Personal Team can run normal device builds, but Siri capability is not supported for Personal Team provisioning.[8][9]
-- 🏢 For a real Siri-enabled device demo, use a paid Apple Developer account.[8][9]
+- 🧪 Simulator is okay for basic validation, but Siri/App Shortcuts behavior can be inconsistent there.
+- 💳 A free Personal Team can run normal device builds, but Siri capability is not supported for Personal Team provisioning.
+- 🏢 For a real Siri-enabled device demo, use a paid Apple Developer account.
 
 ## 🚧 Limitations
 
