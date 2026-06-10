@@ -14,6 +14,7 @@ struct ShortcutTransferConfirmView: View {
     @EnvironmentObject var payeeStore: PayeeStore
     @EnvironmentObject var accountStore: AccountStore
     @EnvironmentObject var authStore: AuthStore
+    @Environment(\.dismiss) private var dismiss
 
     @State private var resolvedPayee: Payee?
     @State private var showPayeeNotFound = false
@@ -22,111 +23,82 @@ struct ShortcutTransferConfirmView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                VStack(spacing: 8) {
-                    Text("Confirm transfer")
-                        .font(.title.bold())
-                    Text("Prepared from Siri / Shortcuts")
-                        .foregroundStyle(.secondary)
-                        .font(.footnote)
-                }
-                
-                VStack(alignment: .leading, spacing: 12) {
-                    row(title: "Payee alias", value: draft.payeeAlias)
-                    
-                    if let payee = resolvedPayee {
-                        row(title: "Payee name", value: payee.name)
-                        row(title: "Account / UPI", value: payee.accountRef)
-                    } else {
-                        row(title: "Payee", value: "Not found")
-                            .foregroundStyle(.red)
-                    }
-                    
-                    row(title: "Amount", value: amountString(draft.amount))
-                    row(title: "Current balance", value: amountString(fromDecimal: accountStore.balance))
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                
-                if showPayeeNotFound {
-                    VStack(spacing: 8) {
-                        Text("No saved payee matching this alias.")
-                            .font(.footnote)
-                            .foregroundStyle(.red)
+            ZStack {
+                Color(.systemBackground).ignoresSafeArea()
 
-                        Text("Add a payee with alias “\(draft.payeeAlias)” in Manage Payees, then run this shortcut again.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
+                VStack(spacing: 0) {
+                    // Content
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            headerAmount
+
+                            detailsCard
+
+                            if showPayeeNotFound {
+                                payeeNotFoundMessage
+                            }
+
+                            Text("You’ll review and confirm this payment in-app. No money moves without confirmation.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.horizontal)
+                        .padding(.top, 16)
                     }
-                }
-                
-                Button {
-                    Task { await handleConfirm() }
-                } label: {
-                    HStack {
-                        if isProcessing {
-                            ProgressView()
-                        } else {
+
+                    // Bottom actions
+                    VStack(spacing: 12) {
+                        Button {
+                            Task { await handleConfirm() }
+                        } label: {
                             Text("Confirm and transfer")
                                 .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color.blue, Color.cyan],
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .foregroundStyle(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 18))
                         }
+                        .disabled(resolvedPayee == nil || isProcessing)
+                        .opacity(resolvedPayee == nil || isProcessing ? 0.5 : 1)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(resolvedPayee == nil ? Color.gray : Color.blue)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .padding(.horizontal)
+                    .padding(.vertical, 12)
+                    .background(.regularMaterial)
                 }
-                .disabled(resolvedPayee == nil || isProcessing)
-                
-                Button("Cancel") {
-                    draftStore.clear()
-                }
-                .foregroundStyle(.red)
-                
-                if didSucceed {
+
+                if isProcessing {
                     Color.black.opacity(0.25)
                         .ignoresSafeArea()
-                    
-                    VStack(spacing: 12) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 56))
-                            .foregroundStyle(.green)
-                        
-                        Text("Payment simulated")
-                            .font(.headline)
-                        
-                        Text("This POC updated your mock balance and recent transactions. A real app would also call the backend and PSP here.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                        
-                        Button("Back to Home") {
-                            draftStore.clear()
-                        }
-                        .padding(.top, 4)
-                    }
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                    .padding(32)
+                    ProgressView("Processing…")
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+
+                if didSucceed {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                    successOverlay
                 }
             }
-            .navigationTitle("Voice payment")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if isProcessing {
-                        ProgressView()
-                    } else {
-                        Button {
-                            draftStore.clear()
-                        } label: {
-                            Image(systemName: "xmark")
-                        }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        draftStore.clear()
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
                     }
                 }
             }
@@ -135,6 +107,131 @@ struct ShortcutTransferConfirmView: View {
             }
         }
     }
+
+    // MARK: - Subviews
+
+    private var headerAmount: some View {
+        VStack(spacing: 4) {
+            Text("Confirm transfer")
+                .font(.headline)
+                .foregroundStyle(.secondary)
+
+            Text(amountString(draft.amount))
+                .font(.system(size: 32, weight: .bold, design: .rounded))
+
+            Text("to \(resolvedPayee?.alias ?? draft.payeeAlias)")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var detailsCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if let payee = resolvedPayee {
+                Text("Recipient")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                HStack(spacing: 12) {
+                    Circle()
+                        .fill(Color.teal.opacity(0.2))
+                        .frame(width: 40, height: 40)
+                        .overlay(
+                            Text(String(payee.alias.prefix(1)).uppercased())
+                                .font(.headline)
+                                .foregroundStyle(.teal)
+                        )
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(payee.alias)
+                            .font(.headline)
+                        Text(payee.name)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text(payee.accountRef)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+                }
+            } else {
+                Text("Recipient")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text("Not found")
+                    .font(.headline)
+                    .foregroundStyle(.red)
+            }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text("Amount")
+                    Spacer()
+                    Text(amountString(draft.amount))
+                        .fontWeight(.semibold)
+                }
+
+                HStack {
+                    Text("Current balance")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(amountString(fromDecimal: accountStore.balance))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .font(.subheadline)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+
+    private var payeeNotFoundMessage: some View {
+        VStack(spacing: 8) {
+            Text("No saved payee matching this alias.")
+                .font(.footnote)
+                .foregroundStyle(.red)
+
+            Text("Add a payee with alias “\(draft.payeeAlias)” in Manage Payees, then run this shortcut again.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+    }
+
+    private var successOverlay: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 56))
+                .foregroundStyle(.green)
+
+            Text("Payment simulated")
+                .font(.headline)
+
+            Text("Your mock balance and recent transactions have been updated. A real app would also call the backend and PSP here.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+
+            Button("Back to Home") {
+                draftStore.clear()
+                dismiss()
+            }
+            .padding(.top, 4)
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .padding(32)
+    }
+
+    // MARK: - Logic
 
     private func resolvePayee() {
         resolvedPayee = payeeStore.find(byAlias: draft.payeeAlias)
@@ -146,17 +243,15 @@ struct ShortcutTransferConfirmView: View {
         isProcessing = true
         didSucceed = false
 
-        // 1. Optional biometric gate
+        // Optional: biometric gate
         if authStore.biometricsEnabled {
             let ok = await authStore.tryBiometricLogin()
             if !ok {
                 isProcessing = false
-                // You could show a toast / error text here if you like
                 return
             }
         }
 
-        // 2. Simulate processing delay
         try? await Task.sleep(nanoseconds: 800_000_000)
 
         let amountDecimal = Decimal(draft.amount)
@@ -164,23 +259,9 @@ struct ShortcutTransferConfirmView: View {
 
         isProcessing = false
         didSucceed = true
-
-        // 3. Auto-dismiss after a short delay
-        Task {
-            try? await Task.sleep(nanoseconds: 1_200_000_000)
-            draftStore.clear()
-        }
     }
 
-    private func row(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.body)
-        }
-    }
+    // MARK: - Formatting
 
     private func amountString(_ amount: Double) -> String {
         let number = NSNumber(value: amount)

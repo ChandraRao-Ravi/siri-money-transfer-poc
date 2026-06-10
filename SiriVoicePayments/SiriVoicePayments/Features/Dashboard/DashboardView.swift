@@ -97,8 +97,7 @@ struct DashboardView: View {
 
             VStack(spacing: 12) {
                 NavigationLink {
-                    // Placeholder for manual send money flow
-                    Text("Send Money (coming soon)")
+                    ManualSendMoneyView()
                 } label: {
                     actionRow(
                         title: "Send Money",
